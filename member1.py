@@ -50,4 +50,4 @@ df_out = pd.concat([df, pd.DataFrame(data, columns=cols)], axis=1)
 # Save (CSV to avoid openpyxl issue)
 df_out.to_csv("rdkit_basic_descriptors.csv", index=False)
 
-print("✅ RDKit basic descriptors generated")
+print("RDKit basic descriptors generated")
