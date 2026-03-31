@@ -4,7 +4,7 @@ from rdkit.Chem import rdMolDescriptors
 import pandas as pd
 
 # Load dataset
-df = pd.read_csv("rdkit_100_unique_smiles.csv")
+df = pd.read_csv("smiles.csv")
 
 # Clean column names
 df.columns = df.columns.str.strip().str.upper()
@@ -14,28 +14,37 @@ if "SMILES" not in df.columns:
     raise ValueError("SMILES column not found.")
 
 data = []
+invalid_smiles = []
 
-for smi in df["SMILES"]:
+for idx, smi in enumerate(df["SMILES"]):
     mol = Chem.MolFromSmiles(smi)
-
     if mol is None:
+        invalid_smiles.append((idx, smi))
         data.append([None]*10)
         continue
 
+    mol_h = Chem.AddHs(mol)  # Explicit hydrogens for NumAtoms and NumBonds
+
     data.append([
-        mol.GetNumAtoms(),                                # NumAtoms
-        mol.GetNumHeavyAtoms(),                           # NumHeavyAtoms
-        mol.GetNumBonds(),                                # NumBonds
-        Descriptors.NumRotatableBonds(mol),               # NumRotatableBonds
-
-        rdMolDescriptors.CalcNumAliphaticRings(mol),      # NumAliphaticRings
-        rdMolDescriptors.CalcNumAromaticRings(mol),       # NumAromaticRings
-        Descriptors.NumHeteroatoms(mol),                  # NumHeteroatoms
-
-        Descriptors.NumHDonors(mol),                      # HBD
-        Descriptors.NumHAcceptors(mol),                   # HBA
-        Chem.GetFormalCharge(mol)                         # FormalCharge
+        mol_h.GetNumAtoms(),                                   # NumAtoms (with H)
+        mol.GetNumHeavyAtoms(),                                # NumHeavyAtoms
+        mol_h.GetNumBonds(),                                   # NumBonds (with H)
+        rdMolDescriptors.CalcNumRotatableBonds(mol),           # NumRotatableBonds
+        rdMolDescriptors.CalcNumAliphaticRings(mol),           # NumAliphaticRings
+        rdMolDescriptors.CalcNumAromaticRings(mol),            # NumAromaticRings
+        rdMolDescriptors.CalcNumHeteroatoms(mol),              # NumHeteroatoms
+        Descriptors.NumHDonors(mol),                           # HBD
+        Descriptors.NumHAcceptors(mol),                        # HBA
+        Chem.GetFormalCharge(mol)                              # FormalCharge
     ])
+
+# Report invalid SMILES
+if invalid_smiles:
+    print(f"Warning: {len(invalid_smiles)} invalid SMILES found:")
+    for idx, smi in invalid_smiles:
+        print(f"  Row {idx}: {smi}")
+else:
+    print("All SMILES parsed successfully.")
 
 # Column names
 cols = [
@@ -44,10 +53,10 @@ cols = [
     "HBD", "HBA", "FormalCharge"
 ]
 
-# Combine
+# Validate row count
+assert len(data) == len(df), f"Row mismatch: {len(data)} vs {len(df)}"
+
+# Combine and save
 df_out = pd.concat([df, pd.DataFrame(data, columns=cols)], axis=1)
-
-# Save (CSV to avoid openpyxl issue)
 df_out.to_csv("member1.csv", index=False)
-
-print("RDKit basic descriptors generated")
+print(f"Done. Output saved: {df_out.shape[0]} rows, {df_out.shape[1]} columns.")
