@@ -11,7 +11,7 @@ df.columns = df.columns.str.strip().str.upper()
 
 # Check SMILES column
 if "SMILES" not in df.columns:
-    raise ValueError("SMILES column not found ❌")
+    raise ValueError("SMILES column not found.")
 
 data = []
 
