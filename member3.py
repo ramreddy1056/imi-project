@@ -16,7 +16,7 @@ print("Columns in dataset:", df.columns)
 
 # Ensure SMILES exists
 if "SMILES" not in df.columns:
-    raise ValueError("❌ SMILES column not found in dataset")
+    raise ValueError("SMILES column not found in dataset")
 
 # -------------------------------
 # Feature extraction
@@ -83,4 +83,4 @@ df_out = pd.concat([df, pd.DataFrame(data, columns=cols)], axis=1)
 
 df_out.to_excel("feat3_rdkit_output.xlsx", index=False)
 
-print("✅ Done! File saved as feat3_rdkit_output.xlsx")
+print("Done! File saved as feat3_rdkit_output.xlsx")
