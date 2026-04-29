@@ -1,0 +1,10 @@
+SMILES,Predicted_Tg,Error
+Oc1ccc(Br)cc1,300.0,0.0
+OCc1ccc(I)cc1,300.0,0.0
+Fc1ccccc1,299.99,0.01
+C(=O)Nc1ccccc1,299.99,0.01
+Fc1ccc(OC)cc1,300.02,0.02
+Cc1ccc(F)cc1,300.03,0.03
+NCc1ccc(C)cc1,300.03,0.03
+Oc1ccc(N)cc1,300.03,0.03
+C(=O)Nc1ccc(C)cc1,300.03,0.03
